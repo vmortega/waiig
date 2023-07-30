@@ -5,13 +5,14 @@ import (
 
 	"github.com/vmortega/waiig/ast"
 	"github.com/vmortega/waiig/lexer"
+	"github.com/vmortega/waiig/token"
 )
 
 func TestLetStatements(t *testing.T) {
 	input := `
-let x 5;
-let = 10;
-let 838383;
+let x = 5;
+let y = 10;
+let foobar = 838383;
    `
 	l := lexer.New(input)
 	p := New(l)
@@ -99,4 +100,26 @@ func checkParserErrors(t *testing.T, p *Parser) {
 		t.Errorf("parser error: %q", msg)
 	}
 	t.FailNow()
+}
+
+func TestString(t *testing.T) {
+	program := &ast.Program{
+		Statements: []ast.Statement{
+			&ast.LetStatement{
+				Token: token.Token{Type: token.LET, Literal: "let"},
+				Name: &ast.Identifier{
+					Token: token.Token{Type: token.IDENT, Literal: "myVar"},
+					Value: "myVar",
+				},
+				Value: &ast.Identifier{
+					Token: token.Token{Type: token.IDENT, Literal: "anotherVar"},
+					Value: "anotherVar",
+				},
+			},
+		},
+	}
+
+	if program.String() != "let myVar = anotherVar;" {
+		t.Errorf("program.String() wrong. got=%q", program.String())
+	}
 }
