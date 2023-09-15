@@ -288,6 +288,19 @@ func TestFunctionApplication(t *testing.T) {
 		{"let add = fn(x, y) { x + y; }; add(5, 5);", 10},
 		{"let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20},
 		{"fn(x) { x; }(5)", 5},
+		{"let add = fn(x) { fn(y) { x + y;}; }; let addTwo = add(2); addTwo(3);", 5},
+		{`
+		let counter = fn(x) { 
+			if (x > 100000) {
+				return x; 
+			} else {
+				let foobar = 9999;
+				counter(x + 1);
+			}
+		};
+		counter(0);`,
+			100001,
+		},
 	}
 	for _, tt := range tests {
 		testIntegerObject(t, testEval(tt.input), tt.expected)
